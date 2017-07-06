@@ -3,7 +3,7 @@
 # package deals
 
 library(devtools)
-library(assertthat)
+# library(assertthat)
 # library(testthat)
 # library(dplyr)
 # library(mgcv)
@@ -15,10 +15,13 @@ devtools::load_all()
 # package documentation
 
 # setup package utilities
-use_package("assertthat")
+use_package("colorspace")
+use_package("colourlovers")
+use_package("colorscience")
+# use_package("assertthat")
 # use_package("testthat")
-use_package("dplyr")
-use_package("httr")
+# use_package("dplyr")
+# use_package("httr")
 # use_package("mgcv")
 # use_package("conditionalSample")
 # use_package("nlme")

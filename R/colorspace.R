@@ -1,83 +1,111 @@
 
+# hsl2rgb <- function(hsl) {
+#   hsl[, 1] <- hsl[, 1] / 360
+#   out <- (colorscience::HSL2RGB((hsl)))
+#   out
+# }
 
+hsv2rgb <- function(hsv) {
+  out <- colorscience::HSV2RGB(hsv)
 
-rgb2yuv <- function(rgb) {
-  if (is.vector(rgb))
-    rgb <- matrix(rgb, nrow = 1)
-  stopifnot(ncol(rgb) == 3)
-  convmat <- matrix(c(0.299, 0.587, 0.114,
-                      -0.14713, -0.28886, 0.436,
-                      0.615, -0.51499, -0.10001),
-                    nrow = 3, byrow = TRUE)
-  out <- rgb %*% t(convmat)
-  colnames(out) <- c("Y", "U", "V")
+  if (any(out < 0) || any(out > 1))
+    stop("Invalid HSV range.")
+
   out
 }
 
-hex2yuv <- function(hex) {
-  rgbmat <- colorspace::hex2RGB(hex)@coords
-  out <- rgb2yuv(rgbmat)
+hex2rgb <- function(hex) {
+  rgb <- colorspace::hex2RGB(hex)
+  out <- rgb@coords
+
+  if (any(out < 0) || any(out > 1))
+    stop("Invalid hex range.")
+
   out
 }
-
 
 yuv2rgb <- function(yuv) {
-  if (is.vector(yuv))
-    rgb <- matrix(yuv, nrow = 1)
-  stopifnot(ncol(yuv) == 3)
   convmat <- matrix(c(0.299, 0.587, 0.114,
                       -0.14713, -0.28886, 0.436,
                       0.615, -0.51499, -0.10001),
                     nrow = 3, byrow = TRUE)
   out <- yuv %*% t(solve(convmat))
-  colnames(out) <- c("R", "G", "B")
+
+  if (any(out < 0) || any(out > 1))
+    stop("Invalid yuv range.")
+
   out
 }
 
-yuv2hex <- function(yuv) {
-  rgbvals <- yuv2rgb(yuv)
-  red <- rgbvals[,1]
-  green <- rgbvals[,2]
-  blue <- rgbvals[,3]
-  out <- rgb(red, green, blue, maxColorValue = 1.0)
+rgb2hsv <- function(rgb) {
+
+  hsv <- colorscience::RGB2HSV(rgb)
+
+  if (any(rgb < 0) || any(rgb > 1))
+    stop("Invalid rgb range. All values must be in [0, 1].")
+
+  out <- structure(.Data = hsv,
+                   rgb = rgb,
+                   class = c("hsv", "color"))
+}
+
+rgb2hsl <- function(rgb) {
+
+  if (any(rgb < 0) || any(rgb > 1))
+    stop("Invalid rgb range. All values must be in [0, 1].")
+
+  hsl <- colorscience::RGB2HSL(rgb)
+  out <- structure(.Data = hsl,
+                   rgb = rgb,
+                   class = c("hsl", "color"))
+}
+
+rgb2rgb <- function(rgb) {
+
+  if (any(rgb < 0) || any(rgb > 1))
+    stop("Invalid rgb range. All values must be in [0, 1].")
+
+  out <- structure(.Data = rgb,
+                   rgb = rgb,
+                   class = c("rgb", "color"))
+}
+
+inhex <- function(x) {
+  stopifnot(all(x >= 0 & x <= 1))
+  out <- sprintf("%02X", round(x * 255))
   out
 }
 
+rgb2hex <- function(rgb) {
 
-hex2hsv <- function(hex) {
-  rgb <- as.data.frame(hex2RGB(hex)@coords)
-  hsv <- with(rgb, rgb2hsv(r = R, g = G, b = B))
-  out <- t(hsv)
-  out
+  if (any(rgb < 0) || any(rgb > 1))
+    stop("Invalid rgb range. All values must be in [0, 1].")
+
+  r <- rgb[, 1]
+  g <- rgb[, 2]
+  b <- rgb[, 3]
+
+  hex <- sprintf("#%s%s%s", inhex(r), inhex(g), inhex(b))
+  out <- structure(.Data = hex,
+                   rgb = rgb,
+                   class = c("hex", "color"))
+}
+
+rgb2yuv <- function(rgb) {
+
+  if (any(rgb < 0) || any(rgb > 1))
+    stop("Invalid rgb range. All values must be in [0, 1].")
+
+
+  convmat <- matrix(c(0.299, 0.587, 0.114,
+                      -0.14713, -0.28886, 0.436,
+                      0.615, -0.51499, -0.10001),
+                    nrow = 3, byrow = TRUE)
+  yuv <- rgb %*% t(convmat)
+  colnames(yuv) <- c("Y", "U", "V")
+  out <- structure(.Data = yuv,
+                   rgb = rgb,
+                   class = c("yuv", "color"))
 }
 
 
-### plotting
-
-plotuv = function(hex) {
-  yuv <- as.data.frame(hex2yuv(hex))
-  yuv$hex <- hex
-  # yuv$Y = 1 + yuv$Y
-  out <- ggplot(yuv, aes(x = U, y = V, color = hex, size = Y)) +
-    geom_point() +
-    scale_color_identity() +
-    scale_size_continuous(limits = c(0, 1)) +
-    coord_fixed(xlim = c(-0.6, 0.6), ylim = c(-0.6, 0.6)) +
-    theme_minimal()
-  out
-}
-
-
-ploths = function(hex) {
-  hsv <- as.data.frame(hex2hsv(hex))
-  hsv$hex <- hex
-  # yuv$Y = 1 + yuv$Y
-  out <- ggplot(hsv, aes(x = h * 2 * pi, y = s, color = hex, size = v)) +
-    geom_point() +
-    coord_polar(theta = "x") +
-    scale_x_continuous(breaks = 0:3 / 2 * pi, labels = c(0, "pi/2", "pi", "3 pi/2"),
-                       limits = c(0, 2 * pi)) +
-    scale_size_continuous(limits = c(0, 0.005)) +
-    scale_color_identity()
-  out
-}
