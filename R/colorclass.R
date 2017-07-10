@@ -54,7 +54,7 @@ hsv <- function(h, s, v) {
   stopifnot(all(v >=0 & v <= 1))
   hsv <- cbind(H = h, S = s, V = v)
   out <- structure(.Data = hsv,
-                   rgb = hsv,
+                   rgb = hsv2rgb(hsv),
                    class = c("hsv", "color"))
   out
 }
@@ -112,6 +112,7 @@ convcolor <- function(color, convto = c("rgb", "yuv", "hsl", "hsv", "hex")) {
   convto <- match.arg(convto)
   stopifnot(is(color, "color"))
   convfun <- get(paste0("rgb2", convto))
+  # print(paste0("rgb2", convto))
   out <- convfun(attr(color, "rgb"))
   out
 }
@@ -144,7 +145,8 @@ as.yuv <- function(color) {
 plus <- function(x, y) {
   # convert x to class of y
   convfun <- get(paste0("as.", class(y)[1]))#, envir = "package:markplots")
-  rgbfun <- get(paste0(class(y)[1], "2rgb"))
+  classy <- ifelse(class(y)[1] == "hex", "rgb", class(y)[1])
+  rgbfun <- get(paste0(classy, "2rgb"))
   backfun <- get(paste0("as.", class(x)[1]))
   # perform matrix addition
   res <- as.matrix(convfun(x)) + as.matrix(y)

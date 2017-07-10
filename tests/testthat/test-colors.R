@@ -65,7 +65,7 @@ test_that("color conversions are reflexive", {
   expect_equal(c2, as.rgb(as.hsl(c2)))
   expect_equal(c3, as.hsl(as.yuv(c3)))
   expect_equal(c4, as.hsv(as.hex(c4)))
-  expect_equal(c5, as.yuv(as.hsv(h5)))
+  expect_equal(c5, as.yuv(as.hsv(c5)))
 })
 
 

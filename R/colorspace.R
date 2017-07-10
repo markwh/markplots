@@ -5,18 +5,20 @@
 #   out
 # }
 
-hsv2rgb <- function(hsv) {
-  out <- colorscience::HSV2RGB(hsv)
-
-  if (any(out < 0) || any(out > 1))
-    stop("Invalid HSV range.")
-
-  out
-}
+# hsv2rgb <- function(hsv) {
+#   hsv <- matrix(hsv, ncol = 3)
+#   hsv[, 1] <- (hsv[, 1] %% 360) / 360
+#   out <- colorscience::HSV2RGB(hsv)
+#   out <- out / 255
+#   if (any(out < 0) || any(out > 1))
+#     stop("Invalid HSV range.")
+#
+#   out
+# }
 
 hex2rgb <- function(hex) {
   rgb <- colorspace::hex2RGB(hex)
-  out <- rgb@coords
+  out <- matrix(rgb@coords, ncol = 3)
 
   if (any(out < 0) || any(out > 1))
     stop("Invalid hex range.")
@@ -39,7 +41,8 @@ yuv2rgb <- function(yuv) {
 
 rgb2hsv <- function(rgb) {
 
-  hsv <- colorscience::RGB2HSV(rgb)
+  hsv <- colorscience::RGB2HSV(rgb * 255)
+  hsv[, 1] <- hsv[, 1] * 360
 
   if (any(rgb < 0) || any(rgb > 1))
     stop("Invalid rgb range. All values must be in [0, 1].")
@@ -54,7 +57,9 @@ rgb2hsl <- function(rgb) {
   if (any(rgb < 0) || any(rgb > 1))
     stop("Invalid rgb range. All values must be in [0, 1].")
 
-  hsl <- colorscience::RGB2HSL(rgb)
+  hsl <- colorscience::RGB2HSL(rgb * 255)
+  hsl[, 1] <- hsl[, 1] * 360
+
   out <- structure(.Data = hsl,
                    rgb = rgb,
                    class = c("hsl", "color"))
@@ -62,12 +67,12 @@ rgb2hsl <- function(rgb) {
 
 rgb2rgb <- function(rgb) {
 
-  if (any(rgb < 0) || any(rgb > 1))
-    stop("Invalid rgb range. All values must be in [0, 1].")
+  stopifnot(!is(rgb, "rgb"))
+  stopifnot(is(rgb, "matrix"))
 
-  out <- structure(.Data = rgb,
-                   rgb = rgb,
-                   class = c("rgb", "color"))
+  # out <- attr(rgb, "rgb")
+  out <- rgb
+  out
 }
 
 inhex <- function(x) {

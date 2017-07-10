@@ -11,21 +11,25 @@ hsl2rgb <- function(hsl) {
   S <- hsl[, 2]
   L <- hsl[, 3]
 
+  R <- G <- B <- var_1 <- var_2 <- rep(NA_real_, nrow(hsl))
 
-  if (S == 0) {
-    R <- G <- B <-  L
-  } else {
-    if (L < 0.5)
-      var_2 <- L * (1 + S)
-    else
-      var_2 <- (L + S) - (S * L)
 
-    var_1 <- 2 * L - var_2
-
-    R <- Hue_2_RGB(var_1, var_2, H + (1 / 3))
-    G <- Hue_2_RGB(var_1, var_2, H)
-    B <- Hue_2_RGB(var_1, var_2, H - (1 / 3))
+  S0 <- S == 0
+  if (any(S0)) {
+    R[S0] <- G[S0] <- B[S0] <- L[S0]
   }
+
+  Lsm <- (L < 0.5 & !S0)
+  Llg <- (!Lsm & !S0)
+
+  var_2[Lsm] <- L[Lsm] * (1 + S[Lsm])
+  var_2[Llg] <- (L[Llg] + S[Llg]) - (L[Llg] * S[Llg])
+  var_1[!S0] <- 2 * L[!S0] - var_2[!S0]
+
+  R[!S0] <- Hue_2_RGB(var_1[!S0], var_2[!S0], H[!S0] + (1 / 3))
+  G[!S0] <- Hue_2_RGB(var_1[!S0], var_2[!S0], H[!S0])
+  B[!S0] <- Hue_2_RGB(var_1[!S0], var_2[!S0], H[!S0] - (1 / 3))
+
   out <- cbind(R, G, B)
 
   if (any(out < 0) || any(out > 1))
@@ -35,15 +39,21 @@ hsl2rgb <- function(hsl) {
 }
 
 Hue_2_RGB <- function(v1, v2, vH) {
-  if (vH < 0)
-    vH <- vH + 1
-  if(vH > 1)
-    vH <- vH - 1
-  if ((6 * vH) < 1)
-    return (v1 + (v2 - v1) * 6 * vH)
-  if ((2 * vH) < 1)
-    return (v2)
-  if ((3 * vH) < 2)
-    return (v1 + (v2 - v1) * ((2 / 3) - vH) * 6)
-  return (v1)
+
+  vsm <- vH < 0
+  vlg <- vH > 1
+
+  vH[vsm] <- vH[vsm] + 1
+  vH[vlg] <- vH[vlg] - 1
+
+  c1 <- vH < 2/3
+  c2 <- vH < 1/2
+  c3 <- vH < 1/6
+
+  out <- v1
+  out[c1] <- v1[c1] + (v2[c1] - v1[c1]) * ((2 / 3) - vH[c1]) * 6
+  out[c2] <- v2[c2]
+  out[c3] <- v1[c3] + (v2[c3] - v1[c3]) * 6 * vH[c3]
+
+  out
 }
