@@ -12,12 +12,16 @@ plotuv = function(hex) {
   out
 }
 
-
+#' Plot in the HS plane of HSV or HSL space
+#'
+#' @import ggplot2
+#' @export
 ploths = function(hex) {
-  hsv <- as.data.frame(hex2hsv(hex))
-  hsv$hex <- hex
-  # yuv$Y = 1 + yuv$Y
-  out <- ggplot(hsv, aes(x = h * 2 * pi, y = s, color = hex, size = v)) +
+  if (!is(hex, "hex"))
+    hex <- hex(hex)
+  hsv <- as.data.frame(as.matrix(as.hsv(hex)))
+  hsv$hex <- as.character(hex)
+  out <- ggplot(hsv, aes(x = h * 2 * pi / 360, y = s, color = hex, size = v)) +
     geom_point() +
     coord_polar(theta = "x") +
     scale_x_continuous(breaks = 0:3 / 2 * pi, labels = c(0, "pi/2", "pi", "3 pi/2"),

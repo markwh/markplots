@@ -77,7 +77,7 @@ test_that("color math works", {
 
   col2 <- col1 + hsl(100, 0.1, 0.1)
   col3 <- as.yuv(col1) - hsl(0, 0, 0.1)
-  col4 <- as.hsv(col1) - rgb(c(0, 0, 0.1))
+  col4 <- as.hsv(col1) - rgb(0, 0, 0.1)
 
   expect_is(col2, "hex")
   expect_is(col3, "yuv")

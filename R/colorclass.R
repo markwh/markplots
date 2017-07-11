@@ -106,14 +106,28 @@ yuv <- function(y, u, v) {
 #   print(as.matrix(yuv))
 # }
 
+make_color <- function(data, space = c("rgb", "yuv", "hsl", "hsv", "hex"),
+                       rgb = NULL) {
+  if (is.null(rgb)) {
+    rgbfun <- get(paste0(space, "2rgb"))
+    rgb <- rgbfun(data)
+  }
+  out <- structure(.Data = data,
+                   rgb = rgb,
+                   class = c(space, "color"))
+}
+
+
 # Conversion functions ----------------------------------------------------
 
 convcolor <- function(color, convto = c("rgb", "yuv", "hsl", "hsv", "hex")) {
   convto <- match.arg(convto)
   stopifnot(is(color, "color"))
+
+  rgb <- attr(color, "rgb")
   convfun <- get(paste0("rgb2", convto))
-  # print(paste0("rgb2", convto))
-  out <- convfun(attr(color, "rgb"))
+  outdat <- convfun(rgb)
+  out <- make_color(data = outdat, space = convto, rgb = rgb)
   out
 }
 

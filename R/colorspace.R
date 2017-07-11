@@ -47,9 +47,10 @@ rgb2hsv <- function(rgb) {
   if (any(rgb < 0) || any(rgb > 1))
     stop("Invalid rgb range. All values must be in [0, 1].")
 
-  out <- structure(.Data = hsv,
-                   rgb = rgb,
-                   class = c("hsv", "color"))
+  # out <- structure(.Data = hsv,
+  #                  rgb = rgb,
+  #                  class = c("hsv", "color"))
+  hsv
 }
 
 rgb2hsl <- function(rgb) {
@@ -60,9 +61,10 @@ rgb2hsl <- function(rgb) {
   hsl <- colorscience::RGB2HSL(rgb * 255)
   hsl[, 1] <- hsl[, 1] * 360
 
-  out <- structure(.Data = hsl,
-                   rgb = rgb,
-                   class = c("hsl", "color"))
+  # out <- structure(.Data = hsl,
+  #                  rgb = rgb,
+  #                  class = c("hsl", "color"))
+  hsl
 }
 
 rgb2rgb <- function(rgb) {
@@ -91,9 +93,10 @@ rgb2hex <- function(rgb) {
   b <- rgb[, 3]
 
   hex <- sprintf("#%s%s%s", inhex(r), inhex(g), inhex(b))
-  out <- structure(.Data = hex,
-                   rgb = rgb,
-                   class = c("hex", "color"))
+  # out <- structure(.Data = hex,
+  #                  rgb = rgb,
+  #                  class = c("hex", "color"))
+  hex
 }
 
 rgb2yuv <- function(rgb) {
@@ -108,9 +111,10 @@ rgb2yuv <- function(rgb) {
                     nrow = 3, byrow = TRUE)
   yuv <- rgb %*% t(convmat)
   colnames(yuv) <- c("Y", "U", "V")
-  out <- structure(.Data = yuv,
-                   rgb = rgb,
-                   class = c("yuv", "color"))
+  # out <- structure(.Data = yuv,
+  #                  rgb = rgb,
+  #                  class = c("yuv", "color"))
+  yuv
 }
 
 

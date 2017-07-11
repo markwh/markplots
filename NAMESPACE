@@ -3,5 +3,7 @@
 export(hex)
 export(hsl)
 export(hsv)
+export(ploths)
 export(rgb)
 export(yuv)
+import(ggplot2)
