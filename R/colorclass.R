@@ -7,15 +7,19 @@ hex <- function(hex) {
   hex <- toupper(hex)
   if (!all(grepl("^#", hex)))
     stop("Hex strings must be preceded by a #.")
-  # if (!grepl("^#[[A-F]]))
-  out <- structure(.Data = hex,
-            rgb = hex2rgb(hex),
-            class = c("hex", "color"))
+  if (!all(grepl("^#([A-F0-9]){6}$", hex)))
+    stop("Invalid hex code")
+  rgb <- hex2rgb(hex)
+  out <- make_color(data = hex, space = "hex", rgb = rgb)
   out
 }
 
 print.hex <- function(hex) {
   print(as.character(hex))
+}
+
+as.character.hex <- function(hex) {
+  attr(hex, "hex")
 }
 
 #' Hue Saturation Lightness color
@@ -29,9 +33,7 @@ hsl <- function(h, s, l) {
   stopifnot(all(s >=0 & s <= 1))
   stopifnot(all(l >=0 & l <= 1))
   hsl <- cbind(H = h, S = s, L = l)
-  out <- structure(.Data = hsl,
-                   rgb = hsl2rgb(hsl),
-                   class = c("hsl", "color"))
+  out <- make_color(hsl, space = "hsl", rgb = hsl2rgb(hsl))
   out
 }
 
@@ -53,9 +55,7 @@ hsv <- function(h, s, v) {
   stopifnot(all(s >=0 & s <= 1))
   stopifnot(all(v >=0 & v <= 1))
   hsv <- cbind(H = h, S = s, V = v)
-  out <- structure(.Data = hsv,
-                   rgb = hsv2rgb(hsv),
-                   class = c("hsv", "color"))
+  out <- make_color(hsv, space = "hsv", rgb = hsv2rgb(hsv))
   out
 }
 
@@ -76,9 +76,7 @@ rgb <- function(r, g, b) {
   stopifnot(all(b >= 0 & b <= 1))
 
   rgb <- cbind(R = r, G = g, B = b)
-  out <- structure(.Data = rgb,
-                   rgb = rgb,
-                   class = c("rgb", "color"))
+  out <- make_color(rgb, space = "rgb", rgb = rgb)
   out
 }
 
@@ -96,9 +94,7 @@ rgb <- function(r, g, b) {
 #' @export
 yuv <- function(y, u, v) {
   yuv <- cbind(Y = y, U = u, V = v)
-  out <- structure(.Data = yuv,
-            rgb = yuv2rgb(yuv),
-            class = c("yuv", "color"))
+  out <- make_color(yuv, space = "yuv", rgb = yuv2rgb(yuv))
   out
 }
 
@@ -108,12 +104,24 @@ yuv <- function(y, u, v) {
 
 make_color <- function(data, space = c("rgb", "yuv", "hsl", "hsv", "hex"),
                        rgb = NULL) {
+  space = match.arg(space)
+  # if (space == "hex")
+    # browser()
   if (is.null(rgb)) {
     rgbfun <- get(paste0(space, "2rgb"))
     rgb <- rgbfun(data)
   }
+
+  hex <- NULL
+  if (space == "hex") {
+    hex <- data
+    data <- rgb
+    space <- c("hex", "rgb")
+  }
+
   out <- structure(.Data = data,
                    rgb = rgb,
+                   hex = hex,
                    class = c(space, "color"))
 }
 
@@ -156,20 +164,46 @@ as.yuv <- function(color) {
   out
 }
 
+`-.color` <- function(x, y) {
+  out <- minus(x, y)
+  out
+}
+
 plus <- function(x, y) {
   # convert x to class of y
-  convfun <- get(paste0("as.", class(y)[1]))#, envir = "package:markplots")
-  classy <- ifelse(class(y)[1] == "hex", "rgb", class(y)[1])
-  rgbfun <- get(paste0(classy, "2rgb"))
+  # classy <- ifelse(class(y)[1] == "hex", "rgb", class(y)[1])
+  classy <- class(y)[1]
+  convfun <- get(paste0("as.", classy))#, envir = "package:markplots")
   backfun <- get(paste0("as.", class(x)[1]))
   # perform matrix addition
   res <- as.matrix(convfun(x)) + as.matrix(y)
-  resrgb <- rgbfun(res)
-
+  rgbmat <- NULL
+  if (classy == "hex") {
+    rgbmat <- res
+    res <- as.character(rgb2hex(res))
+  }
   # Convert result to class of x
-  out1 <- structure(.Data = res,
-                    rgb = resrgb,
-                    class = class(y))
+  # browser()
+  out1 <- make_color(data = res, space = classy, rgb = rgbmat)
+
+  out <- backfun(out1)
+  out
+}
+
+minus <- function(x, y) {
+  # convert x to class of y
+  # classy <- ifelse(class(y)[1] == "hex", "rgb", class(y)[1])
+  classy <- class(y)[1]
+  convfun <- get(paste0("as.", classy))#, envir = "package:markplots")
+  backfun <- get(paste0("as.", class(x)[1]))
+  # perform matrix addition
+  res <- as.matrix(convfun(x)) - as.matrix(y)
+  if (classy == "hex") {
+    rgbmat <- res
+    res <- as.character(rgb2hex(res))
+  }
+  # Convert result to class of x
+  out1 <- make_color(data = res, space = classy)
   out <- backfun(out1)
   out
 }
@@ -180,12 +214,17 @@ print.color <- function(color) {
   print(as.matrix(color))
 }
 
-as.matrix.hex <- function(hex) {
-  as.matrix(as.rgb(hex))
-}
+# as.matrix.hex <- function(hex) {
+#   as.matrix(as.rgb(hex))
+# }
 
 as.matrix.color <- function(color) {
-  attr(color, c("class")) <- NULL
-  attr(color, c("rgb")) <- NULL
+  attr(color, "class") <- NULL
+  attr(color, "rgb") <- NULL
+  attr(color, "hex") <- NULL
   as.matrix.default(color)
+}
+
+as.data.frame.color <- function(color) {
+  as.data.frame(as.matrix(color))
 }

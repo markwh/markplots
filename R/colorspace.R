@@ -22,7 +22,7 @@ hex2rgb <- function(hex) {
 
   if (any(out < 0) || any(out > 1))
     stop("Invalid hex range.")
-
+  colnames(out) <- c("R", "G", "B")
   out
 }
 
@@ -35,7 +35,7 @@ yuv2rgb <- function(yuv) {
 
   if (any(out < 0) || any(out > 1))
     stop("Invalid yuv range.")
-
+  colnames(out) <- c("R", "G", "B")
   out
 }
 
@@ -74,6 +74,7 @@ rgb2rgb <- function(rgb) {
 
   # out <- attr(rgb, "rgb")
   out <- rgb
+  colnames(out) <- c("R", "G", "B")
   out
 }
 

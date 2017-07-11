@@ -40,7 +40,9 @@ hsv2rgb <- function(hsv) {
                                     var_2[var_i == 5]),
                               nrow = 3)
 
-  rgb
+  out <- rgb
+  colnames(out) <- c("R", "G", "B")
+  out
 }
 
 

@@ -34,7 +34,7 @@ hsl2rgb <- function(hsl) {
 
   if (any(out < 0) || any(out > 1))
     stop("Invalid hsl range.")
-
+  colnames(out) <- c("R", "G", "B")
   out
 }
 
@@ -54,6 +54,7 @@ Hue_2_RGB <- function(v1, v2, vH) {
   out[c1] <- v1[c1] + (v2[c1] - v1[c1]) * ((2 / 3) - vH[c1]) * 6
   out[c2] <- v2[c2]
   out[c3] <- v1[c3] + (v2[c3] - v1[c3]) * 6 * vH[c3]
+
 
   out
 }

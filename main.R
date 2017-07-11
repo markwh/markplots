@@ -39,7 +39,7 @@ devtools::test()
 
 
 # Vignettes
-devtools::use_vignette("retrieval") # data retrieval
+devtools::use_vignette("colormath") # data retrieval
 
 
 # Datasets ----------------------------------------------------------------

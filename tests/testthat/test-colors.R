@@ -43,6 +43,7 @@ test_that("color classes work", {
 
 test_that("color ranges work", {
   expect_error(hex("112233"))
+  expect_error(hex("#11hh22"))
   expect_error(rgb(2, 2, 2))
   expect_error(rgb(-1, 0, 0))
   expect_error(hsl(0, 2, 2))
@@ -66,12 +67,14 @@ test_that("color conversions are reflexive", {
   expect_equal(c3, as.hsl(as.yuv(c3)))
   expect_equal(c4, as.hsv(as.hex(c4)))
   expect_equal(c5, as.yuv(as.hsv(c5)))
+
 })
 
 
 test_that("color math works", {
   col1 <- hex("#1122dd")
   expect_equal(col1 + hex("#112211"), hex("#2244ee"))
+  expect_equal(col1 - hex("#112211"), hex("#0000cc"))
   expect_error(col1 + hex("#000033"))
   hsl1 <- as.hsl(col1)
 
@@ -84,3 +87,12 @@ test_that("color math works", {
   expect_is(col4, "hsv")
 })
 
+test_that("make_color rgb is intelligent", {
+  c1 <- hsv(runif(10, 0, 360), runif(10), runif(10))
+
+  col1 <- make_color(as.matrix(c1), space = "hsv", rgb = attr(c1, "rgb"))
+  col2 <- make_color(as.matrix(c1), space = "hsv")
+
+    expect_equal(col1, col2)
+
+})
