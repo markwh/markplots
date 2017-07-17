@@ -159,64 +159,9 @@ as.yuv <- function(color) {
   convcolor(color, "yuv")
 }
 
-`+.color` <- function(x, y) {
-  out <- plus(x, y)
-  out
-}
-
-`-.color` <- function(x, y) {
-  out <- minus(x, y)
-  out
-}
-
-plus <- function(x, y) {
-  # convert x to class of y
-  # classy <- ifelse(class(y)[1] == "hex", "rgb", class(y)[1])
-  classy <- class(y)[1]
-  convfun <- get(paste0("as.", classy))#, envir = "package:markplots")
-  backfun <- get(paste0("as.", class(x)[1]))
-  # perform matrix addition
-  res <- as.matrix(convfun(x)) + as.matrix(y)
-  rgbmat <- NULL
-  if (classy == "hex") {
-    rgbmat <- res
-    res <- as.character(rgb2hex(res))
-  }
-  # Convert result to class of x
-  # browser()
-  out1 <- make_color(data = res, space = classy, rgb = rgbmat)
-
-  out <- backfun(out1)
-  out
-}
-
-minus <- function(x, y) {
-  # convert x to class of y
-  # classy <- ifelse(class(y)[1] == "hex", "rgb", class(y)[1])
-  classy <- class(y)[1]
-  convfun <- get(paste0("as.", classy))#, envir = "package:markplots")
-  backfun <- get(paste0("as.", class(x)[1]))
-  # perform matrix addition
-  res <- as.matrix(convfun(x)) - as.matrix(y)
-  if (classy == "hex") {
-    rgbmat <- res
-    res <- as.character(rgb2hex(res))
-  }
-  # Convert result to class of x
-  out1 <- make_color(data = res, space = classy)
-  out <- backfun(out1)
-  out
-}
-
-# hex("#aaee11") + yuv
-
 print.color <- function(color) {
   print(as.matrix(color))
 }
-
-# as.matrix.hex <- function(hex) {
-#   as.matrix(as.rgb(hex))
-# }
 
 as.matrix.color <- function(color) {
   attr(color, "class") <- NULL

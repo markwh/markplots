@@ -20,9 +20,14 @@ plotuv = function(hex) {
 #'
 #' @import ggplot2
 #' @export
-plothsv = function(hex) {
-  if (!is(hex, "hex"))
-    hex <- hex(hex)
+plothsv = function(color) {
+  if (!is(color, "color")) {
+    if (is.character(color))
+      color <- hex(color)
+    else
+      stop("argument must be a color object or a valid hex string")
+  }
+  hex <- as.hex(color)
   hsv <- as.data.frame(as.hsv(hex))
   hsv$hex <- as.character(hex)
   out <- ggplot(hsv, aes(x = H * 2 * pi / 360, y = S, color = hex, size = V)) +
@@ -42,9 +47,14 @@ plothsv = function(hex) {
 #'
 #' @import ggplot2
 #' @export
-plothsl = function(hex) {
-  if (!is(hex, "hex"))
-    hex <- hex(hex)
+plothsl = function(color) {
+  if (!is(color, "color")) {
+    if (is.character(color))
+      color <- hex(color)
+    else
+      stop("argument must be a color object or a valid hex string")
+  }
+  hex <- as.hex(color)
   hsl <- as.data.frame(as.hsl(hex))
   hsl$hex <- as.character(hex)
   out <- ggplot(hsl, aes(x = H * 2 * pi / 360, y = S, color = hex, size = L)) +
