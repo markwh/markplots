@@ -173,3 +173,18 @@ as.matrix.color <- function(color) {
 as.data.frame.color <- function(color) {
   as.data.frame(as.matrix(color))
 }
+
+
+# plot --------------------------------------------------------------------
+
+color_barplot <- function(color) {
+  colordf <- data.frame(hex = attr(color, "hex"))
+  ggplot(colordf) +
+    geom_bar(aes(x = 1:nrow(colordf),
+                 y = 1,
+                 fill = hex), stat = "identity") +
+    scale_fill_identity() + theme_minimal() +
+    xlab("") + ylab("")
+}
+
+

@@ -16,7 +16,10 @@ plus <- function(x, y) {
   convfun <- get(paste0("as.", classy))#, envir = "package:markplots")
   backfun <- get(paste0("as.", class(x)[1]))
   # perform matrix addition
-  res <- as.matrix(convfun(x)) + as.matrix(y)
+  xmat <- as.matrix(convfun(x))
+  ymat <- matrix(rep(as.matrix(y), length.out = nrow(xmat) * ncol(xmat)),
+                 nrow = nrow(xmat), byrow = TRUE)
+  res <- xmat + ymat
   rgbmat <- NULL
   if (classy == "hex") {
     rgbmat <- res
@@ -37,7 +40,10 @@ minus <- function(x, y) {
   convfun <- get(paste0("as.", classy))#, envir = "package:markplots")
   backfun <- get(paste0("as.", class(x)[1]))
   # perform matrix addition
-  res <- as.matrix(convfun(x)) - as.matrix(y)
+  xmat <- as.matrix(convfun(x))
+  ymat <- matrix(rep(as.matrix(y), length.out = nrow(xmat) * ncol(xmat)),
+                 nrow = nrow(xmat), byrow = TRUE)
+  res <- xmat - ymat
   if (classy == "hex") {
     rgbmat <- res
     res <- as.character(rgb2hex(res))
