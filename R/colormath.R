@@ -54,6 +54,26 @@ minus <- function(x, y) {
   out
 }
 
+times <- function(x, y) {
+  if (!(is.numeric(y) && is.vector(y)))
+    stop("y must be a numeric vector")
+
+  classx <- class(x)[1]
+  # backfun <- get(paste0("as.", classx))
+  xmat <- as.matrix(x)
+  yvec <- rep(y, length.out = nrow(xmat))
+  ymat <- matrix(rep(yvec, length.out = nrow(xmat) * ncol(xmat)),
+                 nrow = nrow(xmat), byrow = FALSE)
+  res <- xmat * ymat
+
+  if (classx == "hex") {
+    rgbmat <- res
+    res <- as.character(rgb2hex(res))
+  }
+  out <- make_color(data = res, space = classx)
+  out
+}
+
 toCartesian <- function(color) {
   stopifnot(is(color, "hsl") || is(color, "hsv"))
   coldf <- as.data.frame(color)
