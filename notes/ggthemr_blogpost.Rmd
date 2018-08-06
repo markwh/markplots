@@ -339,7 +339,9 @@ I'd say that's a damn good dark theme. Now for something lighter.
 lightswatch <- c(mypal$darkest[1:4], "#555555", mypal$mid[1:4])
 lightpal <- ggthemr_palette(swatch = lightswatch,
                           gradient = mypal$darkest[c(1, 3)],
-                          background = mypal$lightest[1],
+                          # background = mypal$lightest[1],
+                          background = "#DDDDEE",
+                          # background = "#FFF0DA",
                           # background = "#555555",
                           line = c("#222222", "#222222"), 
                           gridline = "#c3c3c3", text = "#222222")

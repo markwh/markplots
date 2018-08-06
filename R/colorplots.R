@@ -1,10 +1,33 @@
+
+#' Plot a color object
+#'
+#' @param color a color object
+plot_color <- function(color) {
+  colordf <- data.frame(hex = attr(color, "hex"))
+  ggplot(colordf) +
+    geom_bar(aes(x = 1:nrow(colordf),
+                 y = 1,
+                 fill = hex), width = 1, stat = "identity") +
+    scale_fill_identity() + theme_minimal() +
+    theme(axis.line = element_blank(), axis.title = element_blank(),
+          axis.ticks = element_blank(), axis.text = element_blank(),
+          panel.grid = element_blank())
+  # xlab("") + ylab("")
+}
+
+
 #' Plot in the UV plane of YUV space
 #'
 #' @import ggplot2
 #' @export
-plotuv = function(hex) {
-  if (!is(hex, "hex"))
-    hex <- hex(hex)
+plot_uv = function(color) {
+  if (!is(color, "color")) {
+    if (is.character(color))
+      color <- hex(color)
+    else
+      stop("argument must be a color object or a valid hex string")
+  }
+  hex <- as.hex(color)
   yuv <- as.data.frame(as.yuv(hex))
   yuv$hex <- as.character(hex)
   out <- ggplot(yuv, aes(x = U, y = V, color = hex, size = Y)) +
@@ -20,7 +43,7 @@ plotuv = function(hex) {
 #'
 #' @import ggplot2
 #' @export
-plothsv = function(color) {
+plot_hsv = function(color) {
   if (!is(color, "color")) {
     if (is.character(color))
       color <- hex(color)
@@ -47,7 +70,7 @@ plothsv = function(color) {
 #'
 #' @import ggplot2
 #' @export
-plothsl = function(color) {
+plot_hsl = function(color) {
   if (!is(color, "color")) {
     if (is.character(color))
       color <- hex(color)
