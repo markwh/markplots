@@ -1,0 +1,64 @@
+---
+title: "color scale madness"
+author: "Mark Hagemann"
+date: "5/24/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+source("R/testplots.R")
+gg1 <- gg_point2 # Note this is the only place gg1 is assigned. 
+gg1
+gg1 + theme_emk()
+gg1
+
+gg1 + theme_markdark() + scale_fill_markdark_d()
+gg1 # This is back to normal.
+
+# Try again without printing theme_markdark version
+gg1 + theme_emk()
+gg1
+
+gg2 <- gg1 + theme_markdark() + scale_fill_markdark_d()
+gg1 # Still gets back to normal.
+
+
+
+```
+
+Issue seems to be the setting of color default aesthetic. 
+
+Or is it because with theme_emk I update the shape to no longer be filled in?
+
+Try this:
+
+```{r}
+gg1 + theme_bw()
+update_geom_defaults("point", list(shape = 19))
+gg1 + theme_bw()
+ggreset()
+gg1 + theme_bw()
+
+```
+
+```{r}
+built1 <- ggplot_build(gg1)
+built2 <- ggplot_build(gg1 + theme_markdark())
+gg1 + theme_emk()
+
+built1
+built2
+
+tbl1 <- ggplot_gtable(built1)
+tbl2 <- ggplot_gtable(built1)
+
+library(grid)
+
+grid.draw(tbl1)
+```
+

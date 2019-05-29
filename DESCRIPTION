@@ -1,20 +1,18 @@
 Package: markplots
 Type: Package
-Title: Make Plotting Easier (for Mark)
-Version: 0.0.0.9000
+Title: Misc utilities for theming: colors, fonts, etc
+Version: 0.1.0
 Authors@R: person("Mark", "Hagemann", email = "mark.hagemann@gmail.com", 
     role = c("aut", "cre"))
-Description: Miscellaneous plotting functions.
-License: MIT
+Description: Colors, fonts, digital styles!
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Suggests:
-    testthat,
-    knitr,
-    rmarkdown
-Imports:
-    colorspace,
-    colourlovers,
-    colorscience
-RoxygenNote: 5.0.1
-VignetteBuilder: knitr
+Imports: 
+    dplyr,
+    purrr
+Depends: 
+    R (>= 2.10),
+    ggplot2,
+    ggthemr
+RoxygenNote: 6.1.1
